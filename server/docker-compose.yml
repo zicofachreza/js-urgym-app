@@ -1,0 +1,300 @@
+services:
+  # === User DB ===
+  postgres-user:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME_USER}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_user_data:/var/lib/postgresql/data
+    networks:
+      - gym-network
+
+  # === Booking DB ===
+  postgres-booking:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME_BOOKING}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_booking_data:/var/lib/postgresql/data
+    networks:
+      - gym-network
+
+  # === Gym Class DB ===
+  postgres-gym-class:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME_GYM_CLASS}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_gym_class_data:/var/lib/postgresql/data
+    networks:
+      - gym-network
+    
+  # === Payment DB ===
+  postgres-payment:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME_PAYMENT}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_payment_data:/var/lib/postgresql/data
+    networks:
+      - gym-network
+  
+  # === Membership DB ===
+  postgres-membership:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME_MEMBERSHIP}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5437:5432"
+    volumes:
+      - postgres_membership_data:/var/lib/postgresql/data
+    networks:
+      - gym-network
+
+  # === Chat DB ===
+  postgres-chat:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME_CHAT}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5438:5432"
+    volumes:
+      - postgres_chat_data:/var/lib/postgresql/data
+    networks:
+      - gym-network
+
+  # === Zookeeper ===
+  zookeeper:
+    image: wurstmeister/zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - gym-network
+
+  # === Kafka ===
+  kafka:
+    image: wurstmeister/kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9092"]
+      interval: 15s
+      timeout: 10s
+      retries: 6
+    networks:
+      - gym-network
+
+  # === Redis (for chat presence & socket adapter) ===
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gym-network
+
+  # === User Service ===
+  user-service:
+    build:
+      context: ./user-service
+      args:
+        NODE_ENV: development
+    command: npm run dev
+    volumes:
+      - ./user-service:/app
+      - /app/node_modules
+    env_file:
+      - ./user-service/.env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres-user:
+        condition: service_started
+    ports:
+      - "3001:3001"
+    networks:
+      - gym-network
+
+  # === Booking Service ===
+  booking-service:
+    build:
+      context: ./booking-service
+      args:
+        NODE_ENV: development
+    command: npm run dev
+    volumes:
+      - ./booking-service:/app
+      - /app/node_modules
+    env_file:
+      - ./booking-service/.env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres-booking:
+        condition: service_started
+    ports:
+      - "3002:3002"
+    networks:
+      - gym-network
+
+  # === Gym Class Service ===
+  gym-class-service:
+    build:
+      context: ./gym-class-service
+      args:
+        NODE_ENV: development
+    command: npm run dev
+    volumes:
+      - ./gym-class-service:/app
+      - /app/node_modules
+    env_file:
+      - ./gym-class-service/.env
+    depends_on:
+      kafka:
+          condition: service_healthy
+      postgres-gym-class:
+          condition: service_started
+    ports:
+      - "3003:3003"
+    networks:
+      - gym-network
+
+  # === Payment Service ===
+  payment-service:
+    build:
+      context: ./payment-service
+      args:
+        NODE_ENV: development
+    command: npm run dev
+    volumes:
+      - ./payment-service:/app
+      - /app/node_modules
+    env_file:
+      - ./payment-service/.env
+    depends_on:
+      kafka:
+          condition: service_healthy
+      postgres-payment:
+          condition: service_started
+    ports:
+      - "3004:3004"
+    networks:
+      - gym-network
+  
+  # === Membership Service ===
+  membership-service:
+    build:
+      context: ./membership-service
+      args:
+        NODE_ENV: development
+    command: npm run dev
+    volumes:
+      - ./membership-service:/app
+      - /app/node_modules
+    env_file:
+      - ./membership-service/.env
+    depends_on:
+      kafka:
+          condition: service_healthy
+      postgres-membership:
+          condition: service_started
+    ports:
+      - "3005:3005"
+    networks:
+      - gym-network
+
+  # === Chat Service ===
+  chat-service:
+    build:
+      context: ./chat-service
+      args:
+        NODE_ENV: development
+    command: npm run dev
+    volumes:
+      - ./chat-service:/app
+      - /app/node_modules
+    env_file:
+      - ./chat-service/.env
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres-chat:
+          condition: service_started
+    ports:
+      - "3006:3006"
+    networks:
+      - gym-network
+
+networks:
+  gym-network:
+
+volumes:
+  postgres_user_data:
+  postgres_booking_data:
+  postgres_gym_class_data:
+  postgres_payment_data:
+  postgres_membership_data:
+  postgres_chat_data:

@@ -162,7 +162,12 @@ services:
       context: ./user-service
       args:
         NODE_ENV: development
-    command: npm run dev
+    command: >
+      sh -c "
+      npx sequelize-cli db:migrate &&
+      npx sequelize-cli db:seed:all &&
+      npm run dev
+      "
     volumes:
       - ./user-service:/app
       - /app/node_modules
@@ -172,7 +177,7 @@ services:
       kafka:
         condition: service_healthy
       postgres-user:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3001:3001"
     networks:
@@ -184,7 +189,12 @@ services:
       context: ./booking-service
       args:
         NODE_ENV: development
-    command: npm run dev
+    command: >
+      sh -c "
+      npx sequelize-cli db:migrate &&
+      npx sequelize-cli db:seed:all &&
+      npm run dev
+      "
     volumes:
       - ./booking-service:/app
       - /app/node_modules
@@ -194,7 +204,7 @@ services:
       kafka:
         condition: service_healthy
       postgres-booking:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3002:3002"
     networks:
@@ -206,7 +216,12 @@ services:
       context: ./gym-class-service
       args:
         NODE_ENV: development
-    command: npm run dev
+    command: >
+      sh -c "
+      npx sequelize-cli db:migrate &&
+      npx sequelize-cli db:seed:all &&
+      npm run dev
+      "
     volumes:
       - ./gym-class-service:/app
       - /app/node_modules
@@ -214,9 +229,9 @@ services:
       - ./gym-class-service/.env
     depends_on:
       kafka:
-          condition: service_healthy
+        condition: service_healthy
       postgres-gym-class:
-          condition: service_started
+        condition: service_healthy
     ports:
       - "3003:3003"
     networks:
@@ -228,7 +243,12 @@ services:
       context: ./payment-service
       args:
         NODE_ENV: development
-    command: npm run dev
+    command: >
+      sh -c "
+      npx sequelize-cli db:migrate &&
+      npx sequelize-cli db:seed:all &&
+      npm run dev
+      "
     volumes:
       - ./payment-service:/app
       - /app/node_modules
@@ -236,9 +256,9 @@ services:
       - ./payment-service/.env
     depends_on:
       kafka:
-          condition: service_healthy
+        condition: service_healthy
       postgres-payment:
-          condition: service_started
+        condition: service_healthy
     ports:
       - "3004:3004"
     networks:
@@ -250,7 +270,12 @@ services:
       context: ./membership-service
       args:
         NODE_ENV: development
-    command: npm run dev
+    command: >
+      sh -c "
+      npx sequelize-cli db:migrate &&
+      npx sequelize-cli db:seed:all &&
+      npm run dev
+      "
     volumes:
       - ./membership-service:/app
       - /app/node_modules
@@ -258,9 +283,9 @@ services:
       - ./membership-service/.env
     depends_on:
       kafka:
-          condition: service_healthy
+        condition: service_healthy
       postgres-membership:
-          condition: service_started
+        condition: service_healthy
     ports:
       - "3005:3005"
     networks:
@@ -272,7 +297,12 @@ services:
       context: ./chat-service
       args:
         NODE_ENV: development
-    command: npm run dev
+    command: >
+      sh -c "
+      npx sequelize-cli db:migrate &&
+      npx sequelize-cli db:seed:all &&
+      npm run dev
+      "
     volumes:
       - ./chat-service:/app
       - /app/node_modules
@@ -282,7 +312,7 @@ services:
       redis:
         condition: service_healthy
       postgres-chat:
-          condition: service_started
+        condition: service_healthy
     ports:
       - "3006:3006"
     networks:

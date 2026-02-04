@@ -15,11 +15,11 @@ const authRouter = express.Router()
 
 authRouter.post('/register', register)
 authRouter.post('/login', login)
+authRouter.post('/refresh-token', refreshToken)
 authRouter.post('/forgot-password', forgotPassword)
 authRouter.post('/reset-password', resetPassword)
 
 authRouter.use(authenticateUser)
-authRouter.post('/refresh-token', refreshToken)
 authRouter.post('/logout', logout)
 
 export default authRouter

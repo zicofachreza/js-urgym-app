@@ -7,10 +7,10 @@ import {
 } from '../controllers/payment.controller.js'
 import { authenticateUser } from '../middlewares/authenticateUser.js'
 
-const router = express.Router()
+const paymentRouter = express.Router()
 
-router.post('/payments/notification', midtransNotification)
-router.use(authenticateUser)
-router.post('/payments/membership', createPayment)
+paymentRouter.post('/payments/notification', midtransNotification)
+paymentRouter.use(authenticateUser)
+paymentRouter.post('/payments/membership', createPayment)
 
-export default router
+export default paymentRouter

@@ -4,7 +4,6 @@ const { Conversation, Participant } = db
 export const createConversationWithAdmin = async (userId, adminId) => {
     const convo = await Conversation.create({
         UserId: userId,
-        status: 'open',
     })
 
     await Participant.bulkCreate([

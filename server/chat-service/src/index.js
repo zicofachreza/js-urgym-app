@@ -1,9 +1,9 @@
 'use strict'
 
-import express from 'express'
 import dotenv from 'dotenv'
+import cors from 'cors'
+import express from 'express'
 import http from 'http'
-import db from './models/index.js'
 import { initSocket } from './utils/socket.js'
 import { registerChatSocket } from './sockets/chat.socket.js'
 import conversationRouter from './routers/conversation.router.js'
@@ -15,16 +15,13 @@ const app = express()
 const port = process.env.PORT || 3006
 const server = http.createServer(app)
 
+app.use(cors())
 app.use(express.json())
 app.use(conversationRouter)
 app.use(errorHandler)
 
 const startServer = async () => {
     try {
-        if (process.env.NODE_ENV === 'development') {
-            await db.sequelize.sync({ alter: true }) // test -> force: true
-        }
-
         const io = await initSocket(server)
         registerChatSocket(io)
 

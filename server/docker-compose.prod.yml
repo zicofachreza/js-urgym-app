@@ -174,7 +174,7 @@ services:
       kafka:
         condition: service_healthy
       postgres-user:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3001:3001"
     networks:
@@ -194,7 +194,7 @@ services:
       kafka:
         condition: service_healthy
       postgres-booking:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3002:3002"
     networks:
@@ -212,9 +212,9 @@ services:
       - ./gym-class-service/.env
     depends_on:
       kafka:
-          condition: service_healthy
+        condition: service_healthy
       postgres-gym-class:
-          condition: service_started
+        condition: service_healthy
     ports:
       - "3003:3003"
     networks:
@@ -232,9 +232,9 @@ services:
       - ./payment-service/.env
     depends_on:
       kafka:
-          condition: service_healthy
+        condition: service_healthy
       postgres-payment:
-          condition: service_started
+        condition: service_healthy
     ports:
       - "3004:3004"
     networks:
@@ -252,9 +252,9 @@ services:
       - ./membership-service/.env
     depends_on:
       kafka:
-          condition: service_healthy
+        condition: service_healthy
       postgres-membership:
-          condition: service_started
+        condition: service_healthy
     ports:
       - "3005:3005"
     networks:
@@ -274,7 +274,7 @@ services:
       redis:
         condition: service_healthy
       postgres-chat:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "3006:3006"
     networks:

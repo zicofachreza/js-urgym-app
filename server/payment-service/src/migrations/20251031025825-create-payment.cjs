@@ -11,15 +11,16 @@ module.exports = {
             },
             membershipType: {
                 allowNull: false,
-                type: Sequelize.ENUM,
+                type: Sequelize.ENUM('3_months', '6_months', '12_months'),
             },
             amount: {
                 allowNull: false,
                 type: Sequelize.INTEGER,
             },
             status: {
+                allowNull: false,
                 defaultValue: 'pending',
-                type: Sequelize.ENUM,
+                type: Sequelize.ENUM('pending', 'success', 'failed'),
             },
             midtransOrderId: {
                 type: Sequelize.STRING,

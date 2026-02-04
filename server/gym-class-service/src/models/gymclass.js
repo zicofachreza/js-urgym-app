@@ -48,11 +48,19 @@ export default (sequelize, DataTypes) => {
                     notEmpty: { msg: 'Duration is required.' },
                 },
             },
+            description: {
+                type: DataTypes.TEXT,
+                allowNull: false,
+                validate: {
+                    notNull: { msg: 'Description is required.' },
+                    notEmpty: { msg: 'Description is required.' },
+                },
+            },
         },
         {
             sequelize,
             modelName: 'GymClass',
-        }
+        },
     )
     return GymClass
 }

@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "name": "Boxing",
+        "instructor": "Joshua",
+        "schedule": "2025-10-30T09:00:00Z",
+        "capacity": 20,
+        "duration": 60,
+        "description": "This Boxing class is designed to improve physical strength, endurance, and agility through a combination of punching techniques, footwork drills, and high-intensity cardio training. Led by a professional instructor, participants will learn proper boxing fundamentals in a safe and supportive environment while effectively burning calories. Suitable for beginners to intermediate levels who want to enhance fitness and build confidence."
+    },
+    {
+        "id": 2,
+        "name": "Muay Thai",
+        "instructor": "Alex",
+        "schedule": "2025-10-30T09:00:00Z",
+        "capacity": 20,
+        "duration": 60,
+        "description": "The Muay Thai class offers a dynamic martial arts experience focused on striking techniques using fists, elbows, knees, and kicks. This program helps improve strength, flexibility, and mental discipline through structured and safe training sessions. Ideal for individuals who want to develop self-defense skills while maintaining overall physical fitness."
+    },
+    {
+        "id": 3,
+        "name": "Yoga",
+        "instructor": "Lina",
+        "schedule": "2025-10-30T09:00:00Z",
+        "capacity": 20,
+        "duration": 60,
+        "description": "This Yoga class focuses on creating balance between body, mind, and breath through a series of poses, breathing techniques, and relaxation practices. Participants will experience improved flexibility, concentration, and mental clarity. Suitable for all levels, from beginners to advanced practitioners seeking a holistic approach to wellness."
+    },
+    {
+        "id": 4,
+        "name": "Cardio Dance",
+        "instructor": "Angel",
+        "schedule": "2025-10-30T09:00:00Z",
+        "capacity": 20,
+        "duration": 60,
+        "description": "The Cardio Dance class combines energetic dance movements with cardiovascular exercise to improve stamina, coordination, and heart health. Set to upbeat music in a fun and motivating atmosphere, this class allows participants to burn calories while enjoying every moment of the workout. Perfect for anyone looking for an exciting and enjoyable way to stay active."
+    }
+]

@@ -19,6 +19,7 @@ export default (sequelize, DataTypes) => {
             status: {
                 type: DataTypes.ENUM('pending', 'success', 'failed'),
                 defaultValue: 'pending',
+                allowNull: false,
             },
             midtransOrderId: DataTypes.STRING,
             midtransTransactionId: DataTypes.STRING,

@@ -14,6 +14,7 @@ module.exports = {
                 type: Sequelize.INTEGER,
             },
             status: {
+                allowNull: false,
                 defaultValue: 'open',
                 type: Sequelize.ENUM('open', 'closed'),
             },

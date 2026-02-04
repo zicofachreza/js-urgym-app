@@ -20,6 +20,12 @@ export default (err, req, res, next) => {
                 message: 'The requested gym class was not found.',
             })
 
+        case 'GymClassNotYet':
+            return res.status(404).json({
+                status: 'error',
+                message: 'No gym class yet.',
+            })
+
         case 'SequelizeDatabaseError':
             return res
                 .status(500)

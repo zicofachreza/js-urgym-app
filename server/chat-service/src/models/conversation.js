@@ -17,7 +17,11 @@ export default (sequelize, DataTypes) => {
     Conversation.init(
         {
             UserId: DataTypes.INTEGER,
-            status: DataTypes.STRING,
+            status: {
+                type: DataTypes.ENUM('open', 'closed'),
+                allowNull: false,
+                defaultValue: 'open',
+            },
             lastMessageAt: DataTypes.DATE,
         },
         {

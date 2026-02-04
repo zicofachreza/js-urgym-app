@@ -61,6 +61,14 @@ export const registerChatSocket = (io) => {
                     return
                 }
 
+                const convo = await Conversation.findByPk(conversationId)
+                if (!convo || convo.status === 'closed') {
+                    socket.emit('chat:error', {
+                        message: 'Conversation already closed',
+                    })
+                    return
+                }
+
                 // pastikan sender participant
                 const participant = await Participant.findOne({
                     where: {

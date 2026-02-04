@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "type": "3_months",
+        "price": 300000,
+        "description": "Membership is active for 3 months."
+    },
+    {
+        "id": 2,
+        "type": "6_months",
+        "price": 550000,
+        "description": "Membership is active for 6 months."
+    },
+    {
+        "id": 3,
+        "type": "12_months",
+        "price": 1000000,
+        "description": "Membership is active for 12 months."
+    }
+]

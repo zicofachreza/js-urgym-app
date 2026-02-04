@@ -3,32 +3,31 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.bulkInsert('MembershipPlans', [
-            {
-                type: '3_months',
-                price: 300000,
-                description: 'Membership is active for 3 months.',
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                type: '6_months',
-                price: 550000,
-                description: 'Membership is active for 6 months.',
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                type: '12_months',
-                price: 1000000,
-                description: 'Membership is active for 12 months.',
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-        ])
+        const existing = await queryInterface.sequelize.query(
+            `
+            SELECT id
+            FROM "MembershipPlans"
+            LIMIT 1;
+            `,
+            { type: Sequelize.QueryTypes.SELECT }
+        )
+
+        if (existing.length > 0) {
+            console.log('Membership Plans already seeded, skipping...')
+            return
+        }
+
+        const membershipData = require('../data/membership.data.json').map(
+            (el) => {
+                delete el.id
+                el.createdAt = new Date()
+                el.updatedAt = new Date()
+
+                return el
+            }
+        )
+        await queryInterface.bulkInsert('MembershipPlans', membershipData, {})
     },
 
-    async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete('MembershipPlans', null, {})
-    },
+    async down() {},
 }

@@ -1,11 +1,10 @@
+import 'package:client/core/extensions/num_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import '../bloc/membership_plan_bloc.dart';
 import '../bloc/membership_plan_event.dart';
 import '../bloc/membership_plan_state.dart';
-
 import './membership_summary_page.dart';
 
 class MembershipPlanPage extends StatefulWidget {
@@ -16,8 +15,6 @@ class MembershipPlanPage extends StatefulWidget {
 }
 
 class _MembershipPlanPageState extends State<MembershipPlanPage> {
-  final _currency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ');
-
   @override
   void initState() {
     super.initState();
@@ -103,8 +100,8 @@ class _MembershipPlanPageState extends State<MembershipPlanPage> {
                               const SizedBox(height: 12),
                               Text(
                                 plan.discountPrice != null
-                                    ? _currency.format(plan.discountPrice)
-                                    : _currency.format(plan.price),
+                                    ? plan.discountPrice!.toRupiah()
+                                    : plan.price.toRupiah(),
                                 style: const TextStyle(
                                   color: Colors.green,
                                   fontSize: 18,
@@ -113,7 +110,7 @@ class _MembershipPlanPageState extends State<MembershipPlanPage> {
                               ),
                               if (plan.discountPrice != null)
                                 Text(
-                                  _currency.format(plan.price),
+                                  plan.price.toRupiah(),
                                   style: const TextStyle(
                                     color: Colors.white38,
                                     decoration: TextDecoration.lineThrough,
@@ -135,7 +132,7 @@ class _MembershipPlanPageState extends State<MembershipPlanPage> {
                   ),
                 ),
 
-                // NEXT BUTTON
+                // NEXT BUTTON (muncul hanya jika ada selected)
                 if (state.selected != null)
                   Padding(
                     padding: const EdgeInsets.all(16),

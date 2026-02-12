@@ -1,3 +1,5 @@
+import 'package:client/features/booking/presentation/bloc/booking_history/booking_history_bloc.dart';
+import 'package:client/features/booking/presentation/bloc/booking_history/booking_history_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -27,7 +29,7 @@ class MainPage extends StatelessWidget {
       child: BlocBuilder<BottomNavCubit, BottomNavState>(
         builder: (context, state) {
           return Scaffold(
-            body: _pages[state.index],
+            body: IndexedStack(index: state.index, children: _pages),
 
             bottomNavigationBar: Theme(
               data: Theme.of(context).copyWith(splashColor: Colors.transparent),
@@ -35,6 +37,11 @@ class MainPage extends StatelessWidget {
                 currentIndex: state.index,
                 onTap: (index) {
                   context.read<BottomNavCubit>().changeTab(index);
+                  if (index == 3) {
+                    context.read<BookingHistoryBloc>().add(
+                      LoadBookingHistory(),
+                    );
+                  }
                 },
                 type: BottomNavigationBarType.fixed,
                 backgroundColor: Colors.black,

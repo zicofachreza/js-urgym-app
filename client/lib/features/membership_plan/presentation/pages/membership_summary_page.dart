@@ -1,19 +1,17 @@
+import 'package:client/core/extensions/num_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import '../../data/models/membership_plan_model.dart';
-import '../../../payment/presentation/bloc/payment_bloc.dart';
-import '../../../payment/presentation/bloc/payment_event.dart';
-import '../../../payment/presentation/bloc/payment_state.dart';
+import '../../../payment/presentation/bloc/payment/payment_bloc.dart';
+import '../../../payment/presentation/bloc/payment/payment_event.dart';
+import '../../../payment/presentation/bloc/payment/payment_state.dart';
 import '../../../payment/presentation/pages/payment_webview_page.dart';
 
 class MembershipSummaryPage extends StatelessWidget {
   final MembershipPlanModel plan;
 
-  MembershipSummaryPage({super.key, required this.plan});
-
-  final _currency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ');
+  const MembershipSummaryPage({super.key, required this.plan});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +48,7 @@ class MembershipSummaryPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Color.fromARGB(255, 172, 14, 3),
+              backgroundColor: Color.fromARGB(255, 33, 33, 33),
             ),
           );
         }
@@ -131,21 +129,17 @@ class MembershipSummaryPage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _priceRow('Price', _currency.format(plan.price)),
+                    _priceRow('Price', plan.price.toRupiah()),
                     if (plan.discountPrice != null) ...[
                       const SizedBox(height: 8),
                       _priceRow(
                         'Discount',
-                        '- ${_currency.format(plan.price - plan.discountPrice!)}',
+                        '- ${(plan.price - plan.discountPrice!).toRupiah()}',
                         valueColor: Colors.green,
                       ),
                     ],
                     const Divider(color: Colors.white12, height: 24),
-                    _priceRow(
-                      'Total',
-                      _currency.format(finalPrice),
-                      isTotal: true,
-                    ),
+                    _priceRow('Total', finalPrice.toRupiah(), isTotal: true),
                   ],
                 ),
               ),

@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
+import 'package:client/features/payment/domain/usecases/create_payment_usecase.dart';
 import 'payment_event.dart';
 import 'payment_state.dart';
-import '../../domain/usecases/create_payment_usecase.dart';
 
 class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
   final CreatePaymentUseCase useCase;

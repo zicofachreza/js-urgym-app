@@ -13,6 +13,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
   @override
   void initState() {
     super.initState();
@@ -38,10 +41,21 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        title: const Text(
+          'Welcome Home',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
-            // ⏳ LOADING
             if (state is HomeLoading) {
               return const Center(
                 child: CircularProgressIndicator(
@@ -51,7 +65,6 @@ class _HomePageState extends State<HomePage> {
               );
             }
 
-            // ❌ ERROR
             if (state is HomeError) {
               return Center(
                 child: Text(
@@ -63,50 +76,74 @@ class _HomePageState extends State<HomePage> {
               );
             }
 
-            // ✅ LOADED
             if (state is HomeLoaded) {
               final data = state.data;
 
               return CustomScrollView(
                 slivers: [
-                  // ================== APP BAR ==================
-                  SliverAppBar(
-                    pinned: true,
-                    backgroundColor: Colors.black,
-                    elevation: 0,
-                    title: const Text(
-                      'Welcome Home',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-
-                  // ================== CONTENT ==================
                   SliverPadding(
                     padding: const EdgeInsets.all(16),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        // ===== NEWS SLIDER =====
+                        // ================= NEWS SLIDER =================
                         SizedBox(
-                          height: 180,
-                          child: PageView.builder(
-                            itemCount: data.news.length,
-                            itemBuilder: (context, index) {
-                              final item = data.news[index];
-                              return _NewsCard(
-                                title: item['title']!,
-                                subtitle: item['subtitle']!,
-                              );
-                            },
+                          height: 200,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: PageView.builder(
+                                  controller: _pageController,
+                                  itemCount: data.news.length,
+                                  onPageChanged: (index) {
+                                    setState(() {
+                                      _currentPage = index;
+                                    });
+                                  },
+                                  itemBuilder: (context, index) {
+                                    final item = data.news[index];
+                                    return _NewsCard(
+                                      title: item['title']!,
+                                      subtitle: item['subtitle']!,
+                                    );
+                                  },
+                                ),
+                              ),
+
+                              const SizedBox(height: 14),
+
+                              // ===== MODERN DOT INDICATOR =====
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(
+                                  data.news.length,
+                                  (index) => AnimatedContainer(
+                                    duration: const Duration(milliseconds: 300),
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    height: 8,
+                                    width: _currentPage == index ? 22 : 8,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: _currentPage == index
+                                          ? const Color.fromARGB(
+                                              255,
+                                              172,
+                                              14,
+                                              3,
+                                            )
+                                          : Colors.white24,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
 
                         const SizedBox(height: 24),
 
-                        // ===== OUR EQUIPMENT =====
+                        // ================= OUR EQUIPMENT =================
                         const Text(
                           'Our Equipment',
                           style: TextStyle(
@@ -136,7 +173,7 @@ class _HomePageState extends State<HomePage> {
 
                         const SizedBox(height: 24),
 
-                        // ===== OUR LOCATION =====
+                        // ================= OUR LOCATION =================
                         const Text(
                           'Our Location',
                           style: TextStyle(
@@ -226,13 +263,6 @@ class _EquipmentCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: Colors.grey.shade900,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 6,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       padding: const EdgeInsets.all(14),
       child: Column(
@@ -243,9 +273,18 @@ class _EquipmentCard extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Color.fromARGB(255, 172, 14, 3).withValues(alpha: 0.15),
+              color: const Color.fromARGB(
+                255,
+                172,
+                14,
+                3,
+              ).withValues(alpha: 0.15),
             ),
-            child: Icon(icon, color: Color.fromARGB(255, 172, 14, 3), size: 24),
+            child: Icon(
+              icon,
+              color: const Color.fromARGB(255, 172, 14, 3),
+              size: 24,
+            ),
           ),
           const SizedBox(height: 14),
           Text(

@@ -1,4 +1,4 @@
-import '../repositories/booking_repository.dart';
+import 'package:client/features/booking/domain/repositories/booking_repository.dart';
 
 class CancelBookingUseCase {
   final BookingRepository repository;

@@ -1,6 +1,6 @@
+import 'package:client/core/extensions/date_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/network/dio_client.dart';
 
@@ -101,10 +101,26 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
           // ✅ LOADED
           if (state is BookingHistoryLoaded) {
             if (state.bookings.isEmpty) {
-              return const Center(
-                child: Text(
-                  'No booking history yet.',
-                  style: TextStyle(color: Colors.white60),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.history, size: 72, color: Colors.white38),
+                    SizedBox(height: 12),
+                    Text(
+                      'No bookings yet',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Your booking history will appear here',
+                      style: TextStyle(color: Colors.white38, fontSize: 13),
+                    ),
+                  ],
                 ),
               );
             }
@@ -126,13 +142,16 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
                           return MultiBlocProvider(
                             providers: [
                               BlocProvider(
-                                create: (_) => BookingDetailBloc(
-                                  GetBookingByIdUseCase(
-                                    BookingRepositoryImpl(
-                                      BookingRemoteDatasource(dio),
-                                    ),
-                                  ),
-                                ),
+                                create: (_) {
+                                  final repository = BookingRepositoryImpl(
+                                    BookingRemoteDatasource(dio),
+                                  );
+
+                                  return BookingDetailBloc(
+                                    GetBookingByIdUseCase(repository),
+                                    CancelBookingUseCase(repository),
+                                  );
+                                },
                               ),
                               BlocProvider(
                                 create: (_) => BookingCancelBloc(
@@ -222,9 +241,7 @@ class _BookingHistoryPageState extends State<BookingHistoryPage> {
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    DateFormat(
-                                      'EEE, dd MMM yyyy • HH:mm',
-                                    ).format(booking.schedule.toLocal()),
+                                    booking.schedule.toReadableDateTime(),
                                     style: const TextStyle(
                                       color: Colors.white60,
                                       fontSize: 13,

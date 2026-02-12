@@ -1,3 +1,5 @@
+import 'package:client/features/payment/domain/usecases/get_my_payment_usecase.dart';
+import 'package:client/features/payment/presentation/bloc/payment_history/payment_history_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/network/dio_client.dart';
@@ -35,7 +37,7 @@ import 'features/membership_plan/presentation/bloc/membership_plan_bloc.dart';
 import 'features/payment/data/datasources/payment_remote_datasource.dart';
 import 'features/payment/data/repositories/payment_repository_impl.dart';
 import 'features/payment/domain/usecases/create_payment_usecase.dart';
-import 'features/payment/presentation/bloc/payment_bloc.dart';
+import 'features/payment/presentation/bloc/payment/payment_bloc.dart';
 
 // ===== BOOKING HISTORY FEATURE =====
 import 'features/booking/data/datasources/booking_remote_datasource.dart';
@@ -43,11 +45,15 @@ import 'features/booking/data/repositories/booking_repository_impl.dart';
 import 'features/booking/domain/usecases/get_my_booking_usecase.dart';
 import 'features/booking/presentation/bloc/booking_history/booking_history_bloc.dart';
 
-// ===== PROFILE FEATURE =====
+// ===== PROFILE DATA FEATURE =====
+import 'features/profile/domain/usecases/get_my_profile_usecase.dart';
+import 'features/profile/presentation/bloc/profile_data/profile_data_bloc.dart';
+
+// ===== PROFILE (LOGOUT) FEATURE =====
 import 'features/profile/data/datasources/profile_remote_datasource.dart';
 import 'features/profile/data/repositories/profile_repository_impl.dart';
 import 'features/profile/domain/usecases/logout_usecase.dart';
-import 'features/profile/presentation/bloc/profile_bloc.dart';
+import 'features/profile/presentation/bloc/profile/profile_bloc.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -122,6 +128,19 @@ class MyApp extends StatelessWidget {
           },
         ),
 
+        // 📜 PAYMENT HISTORY
+        BlocProvider<PaymentHistoryBloc>(
+          create: (_) {
+            final dio = DioClient.create();
+
+            return PaymentHistoryBloc(
+              GetMyPaymentUsecase(
+                PaymentRepositoryImpl(PaymentRemoteDatasource(dio)),
+              ),
+            );
+          },
+        ),
+
         // BOOKING HISTORY
         BlocProvider<BookingHistoryBloc>(
           create: (_) {
@@ -134,7 +153,20 @@ class MyApp extends StatelessWidget {
           },
         ),
 
-        // 👤 PROFILE
+        // 👤 PROFILE DATA
+        BlocProvider<ProfileDataBloc>(
+          create: (_) {
+            final dio = DioClient.create();
+
+            return ProfileDataBloc(
+              GetMyProfileUsecase(
+                ProfileRepositoryImpl(ProfileRemoteDatasource(dio)),
+              ),
+            );
+          },
+        ),
+
+        // 👤 PROFILE (LOGOUT)
         BlocProvider<ProfileBloc>(
           create: (_) {
             final dio = DioClient.create();

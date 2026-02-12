@@ -1,4 +1,4 @@
-import '../../data/models/booking_model.dart';
+import 'package:client/features/booking/data/models/booking_model.dart';
 
 abstract class BookingRepository {
   Future<String> bookClass(String classId);

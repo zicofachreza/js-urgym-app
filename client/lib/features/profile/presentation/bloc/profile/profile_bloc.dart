@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/storage/token_storage.dart';
+import '../../../../../core/storage/token_storage.dart';
 import 'profile_event.dart';
 import 'profile_state.dart';
-import '../../domain/usecases/logout_usecase.dart';
+import '../../../domain/usecases/logout_usecase.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final LogoutUseCase logoutUseCase;

@@ -1,16 +1,11 @@
+import 'package:client/core/extensions/date_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 // ===== BOOKING DETAIL =====
 import '../bloc/booking_detail/booking_detail_bloc.dart';
 import '../bloc/booking_detail/booking_detail_event.dart';
 import '../bloc/booking_detail/booking_detail_state.dart';
-
-// ===== CANCEL BOOKING =====
-import '../bloc/booking_cancel/booking_cancel_bloc.dart';
-import '../bloc/booking_cancel/booking_cancel_event.dart';
-import '../bloc/booking_cancel/booking_cancel_state.dart';
 
 class BookingDetailPage extends StatefulWidget {
   final String bookingId;
@@ -40,93 +35,65 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
   }
 
   void _showCancelConfirmationDialog(String bookingId) {
-    final bookingCancelBloc = context.read<BookingCancelBloc>();
-
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) {
-        return BlocProvider.value(
-          value: bookingCancelBloc,
-          child: AlertDialog(
-            backgroundColor: Colors.grey.shade900,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.grey.shade900,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: const [
+            Icon(
+              Icons.warning_amber_rounded,
+              color: Color.fromARGB(255, 172, 14, 3),
             ),
-            title: Row(
-              children: const [
-                Icon(
-                  Icons.warning_amber_rounded,
-                  color: Color.fromARGB(255, 172, 14, 3),
-                ),
-                SizedBox(width: 8),
-                Text('Cancel Booking', style: TextStyle(color: Colors.white)),
-              ],
-            ),
-            content: const Text(
-              'Are you sure you want to cancel this booking?\n\n'
-              'This action cannot be undone.',
-              style: TextStyle(color: Colors.white70, height: 1.5),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Back',
-                  style: TextStyle(
-                    color: Colors.white60,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+            SizedBox(width: 8),
+            Text('Cancel Booking', style: TextStyle(color: Colors.white)),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to cancel this booking?\n\n'
+          'This action cannot be undone.',
+          style: TextStyle(color: Colors.white70, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Back',
+              style: TextStyle(
+                color: Colors.white60,
+                fontWeight: FontWeight.bold,
               ),
-              BlocBuilder<BookingCancelBloc, BookingCancelState>(
-                builder: (context, cancelState) {
-                  final isLoading = cancelState is BookingCancelLoading;
-
-                  return ElevatedButton(
-                    onPressed: isLoading
-                        ? null
-                        : () {
-                            Navigator.pop(context);
-                            context.read<BookingCancelBloc>().add(
-                              SubmitCancelBooking(bookingId),
-                            );
-                          },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 172, 14, 3),
-                      disabledBackgroundColor: const Color.fromARGB(
-                        255,
-                        172,
-                        14,
-                        3,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: isLoading
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text(
-                            'Yes, Cancel',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  );
-                },
-              ),
-            ],
+            ),
           ),
-        );
-      },
+          SizedBox(
+            width: 120,
+            child: TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+
+                context.read<BookingDetailBloc>().add(
+                  CancelAndReloadBooking(bookingId),
+                );
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 172, 14, 3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text(
+                'Yes, Cancel',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -146,201 +113,203 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: BlocBuilder<BookingDetailBloc, BookingDetailState>(
-        builder: (context, state) {
-          if (state is BookingDetailLoading) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Color.fromARGB(255, 172, 14, 3),
+      body: BlocListener<BookingDetailBloc, BookingDetailState>(
+        listener: (context, state) {
+          if (state is BookingDetailCancelSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: const Color.fromARGB(255, 4, 80, 20),
               ),
             );
           }
 
           if (state is BookingDetailError) {
-            return Center(
-              child: Text(
-                state.message,
-                style: const TextStyle(color: Color.fromARGB(255, 172, 14, 3)),
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: const Color.fromARGB(255, 33, 33, 33),
               ),
             );
           }
+        },
+        child: BlocBuilder<BookingDetailBloc, BookingDetailState>(
+          builder: (context, state) {
+            if (state is BookingDetailLoading) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: Color.fromARGB(255, 172, 14, 3),
+                ),
+              );
+            }
 
-          if (state is BookingDetailLoaded) {
-            final booking = state.booking;
-            final bool isCancelled = booking.status == 'cancelled';
+            if (state is BookingDetailError) {
+              return Center(
+                child: Text(
+                  state.message,
+                  style: const TextStyle(
+                    color: Color.fromARGB(255, 172, 14, 3),
+                  ),
+                ),
+              );
+            }
 
-            return Column(
-              children: [
-                // ===== CONTENT =====
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          booking.className,
+            if (state is BookingDetailLoaded) {
+              final booking = state.booking;
+              final bool isCancelled = booking.status == 'cancelled';
+
+              return Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            booking.className,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          // ===== STATUS BADGE =====
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _statusColor(booking.status),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Text(
+                              booking.status.toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // ===== MAIN CARD =====
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade900,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.white10),
+                            ),
+                            child: Column(
+                              children: [
+                                _infoRow(
+                                  Icons.schedule,
+                                  'Schedule',
+                                  booking.schedule.toReadableDateTime(),
+                                ),
+                                const SizedBox(height: 12),
+                                _infoRow(
+                                  Icons.person,
+                                  'Instructor',
+                                  booking.instructor,
+                                ),
+                                const SizedBox(height: 12),
+                                _infoRow(
+                                  Icons.timer,
+                                  'Duration',
+                                  '${booking.duration} minutes',
+                                ),
+                                const SizedBox(height: 12),
+                                _infoRow(
+                                  Icons.people,
+                                  'Slots',
+                                  '${booking.capacity}',
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // ===== BOOKING INFO CARD =====
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade900,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.white10),
+                            ),
+                            child: Column(
+                              children: [
+                                _infoRow(
+                                  Icons.event_available,
+                                  'Booking At',
+                                  booking.bookingDate.toReadableDateTime(),
+                                ),
+                                const SizedBox(height: 12),
+                                _infoRow(
+                                  Icons.event_busy,
+                                  'Cancelled At',
+                                  booking.cancelledAt == null
+                                      ? '-'
+                                      : booking.cancelledAt!
+                                            .toReadableDateTime(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // ===== BOTTOM BUTTON =====
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: isCancelled
+                            ? null
+                            : () {
+                                _showCancelConfirmationDialog(booking.id);
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            172,
+                            14,
+                            3,
+                          ),
+                          disabledBackgroundColor: Colors.grey.shade800,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text(
+                          isCancelled ? 'Booking Cancelled' : 'Cancel Booking',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 26,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 12),
-
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _statusColor(booking.status),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Text(
-                            booking.status.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade900,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            children: [
-                              _infoRow(
-                                Icons.schedule,
-                                'Booking At',
-                                DateFormat(
-                                  'EEE, dd MMM yyyy • HH:mm',
-                                ).format(booking.bookingDate.toLocal()),
-                              ),
-                              const SizedBox(height: 12),
-                              _infoRow(
-                                Icons.cancel,
-                                'Cancelled At',
-                                booking.cancelledAt == null
-                                    ? '-'
-                                    : DateFormat(
-                                        'EEE, dd MMM yyyy • HH:mm',
-                                      ).format(booking.cancelledAt!.toLocal()),
-                              ),
-                              const SizedBox(height: 12),
-                              _infoRow(
-                                Icons.person,
-                                'Instructor',
-                                booking.instructor,
-                              ),
-                              const SizedBox(height: 12),
-                              _infoRow(
-                                Icons.timer,
-                                'Duration',
-                                '${booking.duration} minutes',
-                              ),
-                              const SizedBox(height: 12),
-                              _infoRow(
-                                Icons.people,
-                                'Slots',
-                                '${booking.capacity}',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                ],
+              );
+            }
 
-                // ===== BOTTOM BUTTON =====
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: BlocConsumer<BookingCancelBloc, BookingCancelState>(
-                    listener: (context, cancelState) {
-                      if (cancelState is BookingCancelError) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(cancelState.message),
-                            backgroundColor: const Color.fromARGB(
-                              255,
-                              172,
-                              14,
-                              3,
-                            ),
-                          ),
-                        );
-                      }
-
-                      if (cancelState is BookingCancelSuccess) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(cancelState.message),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-
-                        context.read<BookingCancelBloc>().add(
-                          ResetCancelBooking(),
-                        );
-
-                        context.read<BookingDetailBloc>().add(
-                          LoadBookingDetail(widget.bookingId),
-                        );
-                      }
-                    },
-                    builder: (context, cancelState) {
-                      final bool isLoading =
-                          cancelState is BookingCancelLoading;
-
-                      return SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: isCancelled || isLoading
-                              ? null
-                              : () {
-                                  _showCancelConfirmationDialog(booking.id);
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(
-                              255,
-                              172,
-                              14,
-                              3,
-                            ),
-                            disabledBackgroundColor: Colors.grey.shade800,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: Text(
-                            isCancelled
-                                ? 'Booking Cancelled'
-                                : 'Cancel Booking',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          }
-
-          return const SizedBox();
-        },
+            return const SizedBox();
+          },
+        ),
       ),
     );
   }

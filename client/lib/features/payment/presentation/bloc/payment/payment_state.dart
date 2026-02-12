@@ -7,7 +7,6 @@ class PaymentLoading extends PaymentState {}
 class PaymentSuccess extends PaymentState {
   final String snapToken;
   final String redirectUrl;
-
   PaymentSuccess({required this.snapToken, required this.redirectUrl});
 }
 

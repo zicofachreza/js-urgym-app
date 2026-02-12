@@ -11,6 +11,11 @@ class BookingDetailLoaded extends BookingDetailState {
   BookingDetailLoaded(this.booking);
 }
 
+class BookingDetailCancelSuccess extends BookingDetailState {
+  final String message;
+  BookingDetailCancelSuccess(this.message);
+}
+
 class BookingDetailError extends BookingDetailState {
   final String message;
   BookingDetailError(this.message);

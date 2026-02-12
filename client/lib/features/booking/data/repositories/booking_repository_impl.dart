@@ -1,6 +1,6 @@
-import '../../domain/repositories/booking_repository.dart';
-import '../datasources/booking_remote_datasource.dart';
-import '../models/booking_model.dart';
+import 'package:client/features/booking/data/datasources/booking_remote_datasource.dart';
+import 'package:client/features/booking/data/models/booking_model.dart';
+import 'package:client/features/booking/domain/repositories/booking_repository.dart';
 
 class BookingRepositoryImpl implements BookingRepository {
   final BookingRemoteDatasource remote;

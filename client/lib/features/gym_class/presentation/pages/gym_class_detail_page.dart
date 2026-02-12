@@ -1,6 +1,6 @@
+import 'package:client/core/extensions/date_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 // ===== GYM CLASS DETAIL =====
 import '../bloc/gym_class_detail/gym_class_detail_bloc.dart';
@@ -97,15 +97,14 @@ class _GymClassDetailPageState extends State<GymClassDetailPage> {
                           decoration: BoxDecoration(
                             color: Colors.grey.shade900,
                             borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.white10),
                           ),
                           child: Column(
                             children: [
                               _infoRow(
                                 Icons.schedule,
                                 'Schedule',
-                                DateFormat(
-                                  'EEE, dd MMM yyyy • HH:mm',
-                                ).format(item.schedule.toLocal()),
+                                item.schedule.toReadableDateTime(),
                               ),
                               const SizedBox(height: 12),
                               _infoRow(
@@ -167,9 +166,9 @@ class _GymClassDetailPageState extends State<GymClassDetailPage> {
                             content: Text(bookingState.message),
                             backgroundColor: const Color.fromARGB(
                               255,
-                              172,
-                              14,
-                              3,
+                              33,
+                              33,
+                              33,
                             ),
                           ),
                         );
@@ -179,7 +178,7 @@ class _GymClassDetailPageState extends State<GymClassDetailPage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(bookingState.message),
-                            backgroundColor: Colors.green,
+                            backgroundColor: Color.fromARGB(255, 4, 80, 20),
                           ),
                         );
 

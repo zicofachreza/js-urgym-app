@@ -21,7 +21,13 @@ class MembershipPlanBloc
     on<SelectMembershipPlan>((event, emit) {
       if (state is MembershipPlanLoaded) {
         final current = state as MembershipPlanLoaded;
-        emit(MembershipPlanLoaded(current.plans, selected: event.plan));
+
+        // Jika plan yang sama diklik → unselect
+        if (current.selected?.id == event.plan.id) {
+          emit(MembershipPlanLoaded(current.plans, selected: null));
+        } else {
+          emit(MembershipPlanLoaded(current.plans, selected: event.plan));
+        }
       }
     });
   }

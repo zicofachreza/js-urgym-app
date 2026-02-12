@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
-import '../../../../navigation/main_page.dart';
+import 'package:client/navigation/main_page.dart';
 
 class PaymentWebViewPage extends StatefulWidget {
   final String url;
@@ -29,6 +28,7 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
           onPageStarted: (_) {
             setState(() => _isLoading = true);
           },
+
           onPageFinished: (url) async {
             setState(() => _isLoading = false);
 
@@ -65,7 +65,7 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Payment successful. 🎉'),
-        backgroundColor: Colors.green,
+        backgroundColor: Color.fromARGB(255, 4, 80, 20),
       ),
     );
   }
@@ -79,7 +79,7 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Payment cancelled.'),
-        backgroundColor: Colors.orange,
+        backgroundColor: Color.fromARGB(255, 172, 14, 3),
       ),
     );
   }
@@ -93,7 +93,7 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Payment failed. Please try again.'),
-        backgroundColor: Color.fromARGB(255, 172, 14, 3),
+        backgroundColor: Color.fromARGB(255, 33, 33, 33),
       ),
     );
   }
@@ -105,7 +105,7 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
-        final navigator = Navigator.of(context); // ✅ capture sebelum await
+        final navigator = Navigator.of(context);
 
         final canGoBack = await _controller.canGoBack();
 
@@ -114,7 +114,7 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
         if (canGoBack) {
           _controller.goBack();
         } else {
-          navigator.pop(); // ✅ no context after await
+          navigator.pop();
         }
       },
 
@@ -129,7 +129,19 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
           ),
           leading: IconButton(
             icon: const Icon(Icons.close, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const MainPage()),
+                (route) => false,
+              );
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Payment pending.'),
+                  backgroundColor: Color.fromARGB(255, 187, 115, 7),
+                ),
+              );
+            },
           ),
         ),
         body: Stack(

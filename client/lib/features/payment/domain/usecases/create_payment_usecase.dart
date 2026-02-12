@@ -1,4 +1,4 @@
-import '../repositories/payment_repository.dart';
+import 'package:client/features/payment/domain/repositories/payment_repository.dart';
 
 class CreatePaymentUseCase {
   final PaymentRepository repository;
